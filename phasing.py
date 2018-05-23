@@ -24,5 +24,20 @@ def loadfile(file_name):
     snps = np.array(snps)
     return snps
 
+def snps_to_genotypes(snps):
+    return [[snps[i][j] for i in range(len(snps))] for j in range(len(snps[0]))]
 
-example_data1 = loadfile("data/example_data_1.txt")
+def find_haplotypes(genotypes):
+    for genotype in genotypes:
+        for snp in genotype:
+            if snp = 2:
+                # two haplotypes both have alleles 1
+            if snp = 1:
+                # haplotype 1 can have 1 and haplotype 2 will have 0
+                # haplotype 1 can have 0 and haplotype 2 will have 1
+            if snp = 0:
+                # two haplotypes both have alleles 0
+
+    
+
+example_genotypes1 = snps_to_genotypes(loadfile("data/example_data_1.txt"))
