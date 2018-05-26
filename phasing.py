@@ -27,17 +27,30 @@ def loadfile(file_name):
 def snps_to_genotypes(snps):
     return [[snps[i][j] for i in range(len(snps))] for j in range(len(snps[0]))]
 
-def find_haplotypes(genotypes):
+def lst_pairhaplotypes(genotypes):
+    haplotypes = []
     for genotype in genotypes:
+        lst = []
         for snp in genotype:
-            if snp = 2:
+            if snp == 2:
                 # two haplotypes both have alleles 1
-            if snp = 1:
+                lst.append('1')
+            if snp == 1:
                 # haplotype 1 can have 1 and haplotype 2 will have 0
                 # haplotype 1 can have 0 and haplotype 2 will have 1
-            if snp = 0:
+                lst.append('x')
+            if snp == 0:
                 # two haplotypes both have alleles 0
+                lst.append('0')
+        two_haps = [lst, lst]
+        present = False
+        for h in haplotypes:
+            if h == lst:
+                present = True
+        if not present:
+            haplotypes.append(two_haps)
+    return haplotypes
 
-    
 
 example_genotypes1 = snps_to_genotypes(loadfile("data/example_data_1.txt"))
+example_haplotypes1 = lst_pairhaplotypes(example_genotypes1)
