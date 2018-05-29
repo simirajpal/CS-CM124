@@ -27,11 +27,12 @@ def loadfile(file_name):
 '''
 lst_haplotypes
     takes in an array of lists representing the genotypes of several individuals
-    return an array of lists representing the haplotypes corresponding
-        these haplotypes contain an x for heterozygous alleles
+    calls the function possible_haplotypes to determine all of the possible combinations based on
+    heterozygous alleles
+    return an array of lists representing the possible haplotypes of each individual
 '''
 def lst_haplotypes(genotypes):
-    haplotypes = []
+    unknown_haplotypes = []
     for genotype in genotypes:
         lst = []
         for snp in genotype:
@@ -41,45 +42,43 @@ def lst_haplotypes(genotypes):
             if snp == 1:
                 # haplotype 1 can have 1 and haplotype 2 will have 0
                 # haplotype 1 can have 0 and haplotype 2 will have 1
-                lst.append('x')
+                lst.append('heterozygous')
             if snp == 0:
                 # two haplotypes both have alleles 0
                 lst.append('0')
         present = False
-        for h in haplotypes:
+        for h in unknown_haplotypes:
             if h == lst:
                 present = True
         if not present:
-            haplotypes.append(lst)
+            unknown_haplotypes.append(lst)
+    haplotypes = [possible_haplotypes(haplotype) for haplotype in unknown_haplotypes]
     return haplotypes
 
 '''
 possible_haplotypes
-    takes in a list of haplotypes for individuals where x is a heterozygous allele
-    returns a complete list of possible haplotypes
-        every time an x is encountered, it adds another possible haplotype with the 1 allele representing
-        the heterozygous allele rather than the 0 allele
+    takes in a haplotype of some individual genotype where 'heterozygous' is a heterozygous allele
+    returns a complete list of possible haplotypes for one individual
 '''
-def possible_haplotypes(haplotypes):
-    final_haplotypes = []
-    for haplotype in haplotypes:
-        final_haplotype = []
-        for snp in haplotype:
-            if snp == '0' or snp == '1':
-                final_haplotype.append(snp)
-            elif snp == 'x':
-                final_haplotype2 = []
-                for allele in final_haplotype:
-                    final_haplotype2.append(allele)
-                final_haplotype.append('0')
-                final_haplotype2.append('1')
-        if len(final_haplotype2) == len(final_haplotype):
-            final_haplotypes.append(final_haplotype2)
-        final_haplotypes.append(final_haplotype)      
-    return final_haplotypes
-                
+  
+def possible_haplotypes(haplotype):
+    final_haplotype = [[]]
+    for snp in haplotype:
+        if snp == '0' or snp == '1':
+            for pos in final_haplotype:
+                pos.append(snp)
+        elif snp == 'heterozygous':
+            final_haplotype2 = [[] for each in range(len(final_haplotype))]
+            for i in range(len(final_haplotype)):
+                for j in range(len(final_haplotype[i])):
+                    final_haplotype2[i].append(final_haplotype[i][j])
+            for k in range(len(final_haplotype)):
+                final_haplotype[k].append('0')
+                final_haplotype2[k].append('1')
+            final_haplotype = list(final_haplotype + final_haplotype2)
+    return final_haplotype
+            
 # example_haplotypes1 = lst_haplotypes(loadfile("data/example_data_1.txt"))
-# example_possible_haplotypes1=possible_haplotypes(example_haplotypes1)
-# print(np.shape(example_possible_haplotypes1))
-test = possible_haplotypes(lst_haplotypes((loadfile("data/test.txt"))))
+# print(np.shape(example_haplotypes1))
+test = lst_haplotypes((loadfile("data/test.txt")))
 print(test)
