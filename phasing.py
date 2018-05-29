@@ -18,16 +18,19 @@ loadfile
 '''
 def loadfile(file_name):
     data = np.loadtxt(file_name, delimiter = ' ')
-    snps = []
+    genotypes = []
     for line in data:
-        snps.append(list(line))
-    snps = np.array(snps)
-    return snps
+        genotypes.append(list(line))
+    genotypes = np.array(genotypes)
+    return genotypes
 
-def snps_to_genotypes(snps):
-    return [[snps[i][j] for i in range(len(snps))] for j in range(len(snps[0]))]
-
-def lst_pairhaplotypes(genotypes):
+'''
+lst_haplotypes
+    takes in an array of lists representing the genotypes of several individuals
+    return an array of lists representing the haplotypes corresponding
+        these haplotypes contain an x for heterozygous alleles
+'''
+def lst_haplotypes(genotypes):
     haplotypes = []
     for genotype in genotypes:
         lst = []
@@ -42,15 +45,41 @@ def lst_pairhaplotypes(genotypes):
             if snp == 0:
                 # two haplotypes both have alleles 0
                 lst.append('0')
-        two_haps = [lst, lst]
         present = False
         for h in haplotypes:
             if h == lst:
                 present = True
         if not present:
-            haplotypes.append(two_haps)
+            haplotypes.append(lst)
     return haplotypes
 
-
-example_genotypes1 = snps_to_genotypes(loadfile("data/example_data_1.txt"))
-example_haplotypes1 = lst_pairhaplotypes(example_genotypes1)
+'''
+possible_haplotypes
+    takes in a list of haplotypes for individuals where x is a heterozygous allele
+    returns a complete list of possible haplotypes
+        every time an x is encountered, it adds another possible haplotype with the 1 allele representing
+        the heterozygous allele rather than the 0 allele
+'''
+def possible_haplotypes(haplotypes):
+    final_haplotypes = []
+    for haplotype in haplotypes:
+        final_haplotype = []
+        for snp in haplotype:
+            if snp == '0' or snp == '1':
+                final_haplotype.append(snp)
+            elif snp == 'x':
+                final_haplotype2 = []
+                for allele in final_haplotype:
+                    final_haplotype2.append(allele)
+                final_haplotype.append('0')
+                final_haplotype2.append('1')
+        if len(final_haplotype2) == len(final_haplotype):
+            final_haplotypes.append(final_haplotype2)
+        final_haplotypes.append(final_haplotype)      
+    return final_haplotypes
+                
+# example_haplotypes1 = lst_haplotypes(loadfile("data/example_data_1.txt"))
+# example_possible_haplotypes1=possible_haplotypes(example_haplotypes1)
+# print(np.shape(example_possible_haplotypes1))
+test = possible_haplotypes(lst_haplotypes((loadfile("data/test.txt"))))
+print(test)
