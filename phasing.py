@@ -77,7 +77,8 @@ def possible_haplotypes(haplotype):
                 final_haplotype2[k].append('1')
             final_haplotype = list(final_haplotype + final_haplotype2)
     return final_haplotype
-            
+
+      
 # example_haplotypes1 = lst_haplotypes(loadfile("data/example_data_1.txt"))
 # print(np.shape(example_haplotypes1))
 test = lst_haplotypes((loadfile("data/test.txt")))
