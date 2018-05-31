@@ -18,11 +18,17 @@ loadfile
 '''
 def loadfile(file_name):
     data = np.loadtxt(file_name, delimiter = ' ')
-    genotypes = []
+    snps = []
     for line in data:
-        genotypes.append(list(line))
-    genotypes = np.array(genotypes)
-    return genotypes
+        snps.append(list(line))
+    snps = np.array(snps)
+    return snps
+
+'''
+converts data to list of genotypes
+'''
+def convert_to_genotypes(snps):
+     return [[snps[i][j] for i in range(len(snps))] for j in range(len(snps[0]))]
 
 '''
 lst_haplotypes
@@ -31,7 +37,8 @@ lst_haplotypes
     heterozygous alleles
     return an array of lists representing the possible haplotypes of each individual
 '''
-def lst_haplotypes(genotypes):
+def lst_haplotypes(data):
+    genotypes = convert_to_genotypes(data)
     unknown_haplotypes = []
     for genotype in genotypes:
         lst = []
