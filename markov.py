@@ -32,7 +32,7 @@ def initialize_markov(data_file, pos_file):
     haplotypes = []
     #go through haplotypes making initial markov estimates for each individual
     #should be a list (individuals) of lists (SNPs) of lists (haplotype states)
-	phased_haps = lsthaplotypes(data_file) #list (individuals) of lists (haplotype states) of snps
+	phased_haps = lst_haplotypes(data_file) #list (individuals) of lists (haplotype states) of snps
     markov = []
     return cross, markov
 
