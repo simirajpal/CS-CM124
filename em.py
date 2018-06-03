@@ -12,6 +12,8 @@ from itertools import chain
 # freq_lst needs to be a dictionary
 def expectation_step(haplotypes, hap_pairs, freq_lst):
 	probabilities = []
+	numGenotypes = len(hap_pairs)
+	numHaplotypes = numGenotypes*2
 	for i in range(len(hap_pairs)):
 		probability = []
 		for p in range(len(hap_pairs[i])):
@@ -26,14 +28,14 @@ def expectation_step(haplotypes, hap_pairs, freq_lst):
 			for q in range(len(hap_pairs[j])):
 				if hap_pairs[j][q][0] == haplotype or hap_pairs[j][q][1] == haplotype:
 					probs.append(probabilities[j][q])
-		frequencies[''.join(haplotype)] = find_frequency(probs, len(haplotypes))
+		frequencies[''.join(haplotype)] = find_frequency(probs, numHaplotypes)
 	return frequencies, probabilities			
 
 def find_probability(freq1, freq2, numOfPairs):
 	return (freq1*freq2)/(numOfPairs*freq1*freq2)
 	
-def find_frequency(probs, numOfPossibleHaps):
-	return sum(probs)/numOfPossibleHaps
+def find_frequency(probs, numOfHaps):
+	return sum(probs)/numOfHaps
 	
 def maximization_step(probabilities, hap_pairs):
 	correct_pairs = []
