@@ -27,7 +27,7 @@ converts data to list of genotypes
 '''
 def convert_to_genotypes(snps):
 	 return [[snps[i][j] for i in range(len(snps))] for j in range(len(snps[0]))]
-
+	 
 '''
 lst_haplotypes
 	takes in an array of lists representing the genotypes of several individuals
@@ -120,3 +120,4 @@ def remove_duplicates(possibleHaplotypes):
 #print(haps)
 #print(remove_duplicates(haps), '\n')
 #print(haps)
+#print(np.shape(loadfile("data/example_data_1.txt")[0]))#

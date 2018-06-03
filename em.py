@@ -7,6 +7,7 @@ Haplotype Phasing for Recently Admixed Populations
 
 import phasing
 import numpy as np
+from itertools import chain
 
 # freq_lst needs to be a dictionary
 def expectation_step(haplotypes, hap_pairs, freq_lst):
@@ -41,17 +42,52 @@ def maximization_step(probabilities, hap_pairs):
 		correct_pairs.append(hap_pairs[i][index])
 	return correct_pairs
 
-def em(filename, runs):
-	hap_pairs = phasing.lst_haplotypes((phasing.loadfile(filename)))
-	haplotypes = phasing.remove_duplicates(hap_pairs)
-	frequencies = {}
-	for haplotype in haplotypes:
-		frequencies[''.join(haplotype)] = 1/(len(haplotypes))
-	for run in range(runs):
-		frequencies, probabilities = expectation_step(haplotypes, hap_pairs, frequencies)
-		answer = maximization_step(probabilities, hap_pairs)
+def em(filename, runs, piecesize):
+	all_snps = phasing.loadfile(filename)
+	answer = []
+	i = 0
+	while i < len(all_snps):
+		hap_pairs = phasing.lst_haplotypes(all_snps[i:i+piecesize])
+		haplotypes = phasing.remove_duplicates(hap_pairs)
+		frequencies = {}
+		for haplotype in haplotypes:
+			frequencies[''.join(haplotype)] = 1/(len(haplotypes))
+		for run in range(runs):
+			frequencies, probabilities = expectation_step(haplotypes, hap_pairs, frequencies)
+			best_haps = maximization_step(probabilities, hap_pairs)
+			print("completed run # ",run)
+		if i == 0:
+			answer = best_haps
+		else:
+			for j in range(len(answer)):
+				for k in range(len(answer[j])):
+					answer[j][k].append(best_haps[j][k])
+					answer[j][k] = list(chain.from_iterable(answer[j][k]))
+		print("completed piece # ",i)
+		i+= piecesize
 	return answer
 	
+def output(final_haplotypes, output_file):
+	haplotypes_flattened = list(chain.from_iterable(final_haplotypes))
+	output_haplotypes = [[haplotypes_flattened[i][j] for i in range(len(haplotypes_flattened))] for j in range(len(haplotypes_flattened[0]))]
+	file = open(output_file, 'w')
+	for lst in output_haplotypes:
+		for snp in lst:
+			file.write(snp)
+			file.write(' ')
+		file.write('\n')
+	return file
 
-print(em("data/test.txt", 10))
-			
+file1 = 'data/example_data_1.txt'
+file2 = 'data/example_data_2.txt'
+file3 = 'data/example_data_3.txt'
+
+graded_file1 = 'data/test_data_1.txt'
+graded_file2 = 'data/test_data_2.txt'
+
+short_file = 'data/test.txt'
+
+output_file_name = 'test_file.txt'
+
+final_haplotypes = em(short_file, runs = 10, piecesize = 4)
+output(final_haplotypes, output_file_name)
