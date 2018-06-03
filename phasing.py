@@ -53,6 +53,7 @@ def lst_haplotypes(data):
 				lst.append('0')
 		unknown_haplotypes.append(lst)
 	haplotypes = [possible_haplotypes(haplotype) for haplotype in unknown_haplotypes]
+	haplotypes = haplotype_pairs(unknown_haplotypes, haplotypes)
 	return haplotypes
 
 '''
@@ -78,18 +79,44 @@ def possible_haplotypes(haplotype):
 			final_haplotype = list(final_haplotype + final_haplotype2)
 	return final_haplotype
 
-  
+def haplotype_pairs(unknown_haplotypes, lst_haplotypes):
+	haplotype_pairs = []
+	for i in range(len(lst_haplotypes)):
+		indiv_hap_pairs = []
+		for j in range(len(lst_haplotypes[i])):
+			haplotype = []
+			for k in range(len(lst_haplotypes[i][j])):
+				if unknown_haplotypes[i][k] == lst_haplotypes[i][j][k]:
+					if lst_haplotypes[i][j][k] == '1':
+						haplotype.append('1')
+					else:
+						haplotype.append('0')
+				else:
+					if lst_haplotypes[i][j][k] == '1':
+						haplotype.append('0')
+					else:
+						haplotype.append('1')
+			pair = [lst_haplotypes[i][j], haplotype]
+			rev_pair = [haplotype, lst_haplotypes[i][j]]
+			if pair not in indiv_hap_pairs and rev_pair not in indiv_hap_pairs:
+				indiv_hap_pairs.append(pair)
+		haplotype_pairs.append(indiv_hap_pairs)
+	return haplotype_pairs
 '''
 remove duplicates
+	flattens the list of haplotypes and removes all duplicates
+	returns a list of all possible haplotypes
 '''
 def remove_duplicates(possibleHaplotypes):
 	possibleHaplotypes = list(chain.from_iterable(possibleHaplotypes))
 	possibleHaplotypes.sort()
-	return list(possibleHaplotypes for possibleHaplotypes,_ in groupby(possibleHaplotypes))	
+	result = list(possibleHaplotypes for possibleHaplotypes,_ in groupby(possibleHaplotypes))
+	return list(chain.from_iterable(result))
   
+
 # example_haplotypes1 = lst_haplotypes(loadfile("data/example_data_1.txt"))
 # print(np.shape(example_haplotypes1))
-haps = lst_haplotypes((loadfile("data/test.txt")))
+#haps = lst_haplotypes((loadfile("data/test.txt")))
 #print(haps)
-#print(remove_duplicates(haps))
-print(haps)
+#print(remove_duplicates(haps), '\n')
+#print(haps)
