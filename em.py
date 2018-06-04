@@ -9,7 +9,6 @@ import phasing
 import numpy as np
 from itertools import chain
 
-# freq_lst needs to be a dictionary
 def expectation_step(haplotypes, hap_pairs, freq_lst):
 	probabilities = []
 	numGenotypes = len(hap_pairs)
@@ -27,7 +26,7 @@ def expectation_step(haplotypes, hap_pairs, freq_lst):
 			f2 = freq_lst[''.join(hap_pairs[i][p][1])]
 			probability.append(find_probability(f1, f2, totalFrequencyValue[i]))
 		probabilities.append(probability)
-	frequencies = {}	
+	frequencies = {}
 	for haplotype in haplotypes:
 		probs = []
 		for j in range(len(hap_pairs)):
@@ -94,7 +93,7 @@ graded_file2 = 'data/test_data_2.txt'
 
 short_file = 'data/test.txt'
 
-output_file_name = 'test_file.txt'
+output_file_name = 'example1_sol_10-8.txt'
 
-final_haplotypes = em(short_file, runs = 100, piecesize = 4)
+final_haplotypes = em(file1, runs = 8, piecesize = 11)
 output(final_haplotypes, output_file_name)
