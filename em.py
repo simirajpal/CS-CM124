@@ -14,12 +14,18 @@ def expectation_step(haplotypes, hap_pairs, freq_lst):
 	probabilities = []
 	numGenotypes = len(hap_pairs)
 	numHaplotypes = numGenotypes*2
+	totalFrequencyValue = []
+	for indiv in hap_pairs:
+		frequency = 0
+		for pair in indiv:
+			frequency += (freq_lst[''.join(pair[0])])*(freq_lst[''.join(pair[1])])
+		totalFrequencyValue.append(frequency)
 	for i in range(len(hap_pairs)):
 		probability = []
 		for p in range(len(hap_pairs[i])):
 			f1 = freq_lst[''.join(hap_pairs[i][p][0])]
 			f2 = freq_lst[''.join(hap_pairs[i][p][1])]
-			probability.append(find_probability(f1, f2, len(hap_pairs[i])))
+			probability.append(find_probability(f1, f2, totalFrequencyValue[i]))
 		probabilities.append(probability)
 	frequencies = {}	
 	for haplotype in haplotypes:
@@ -31,8 +37,8 @@ def expectation_step(haplotypes, hap_pairs, freq_lst):
 		frequencies[''.join(haplotype)] = find_frequency(probs, numHaplotypes)
 	return frequencies, probabilities			
 
-def find_probability(freq1, freq2, numOfPairs):
-	return (freq1*freq2)/(numOfPairs*freq1*freq2)
+def find_probability(freq1, freq2, totalFrequencyValue):
+	return (freq1*freq2)/totalFrequencyValue
 	
 def find_frequency(probs, numOfHaps):
 	return sum(probs)/numOfHaps
@@ -57,7 +63,6 @@ def em(filename, runs, piecesize):
 		for run in range(runs):
 			frequencies, probabilities = expectation_step(haplotypes, hap_pairs, frequencies)
 			best_haps = maximization_step(probabilities, hap_pairs)
-			print("completed run # ",run)
 		if i == 0:
 			answer = best_haps
 		else:
@@ -91,5 +96,5 @@ short_file = 'data/test.txt'
 
 output_file_name = 'test_file.txt'
 
-final_haplotypes = em(short_file, runs = 10, piecesize = 4)
+final_haplotypes = em(short_file, runs = 100, piecesize = 4)
 output(final_haplotypes, output_file_name)
