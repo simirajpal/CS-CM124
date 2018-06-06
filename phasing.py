@@ -32,7 +32,7 @@ lst_haplotypes
 	heterozygous alleles
 	return an array of lists representing the possible haplotypes of each individual
 '''
-def lst_haplotypes(data):
+'''def lst_haplotypes(data):
 	genotypes = convert_to_genotypes(data)
 	unknown_haplotypes = []
 	for genotype in genotypes:
@@ -41,25 +41,72 @@ def lst_haplotypes(data):
 			if snp == 2:
 				# two haplotypes both have alleles 1
 				lst.append('1')
-			if snp == 1:
+			elif snp == 1:
 				# haplotype 1 can have 1 and haplotype 2 will have 0
 				# haplotype 1 can have 0 and haplotype 2 will have 1
 				lst.append('heterozygous')
-			if snp == 0:
+			elif snp == 0:
 				# two haplotypes both have alleles 0
 				lst.append('0')
 		unknown_haplotypes.append(lst)
-	haplotypes = [possible_haplotypes(haplotype) for haplotype in unknown_haplotypes]
-	haplotypes = haplotype_pairs(unknown_haplotypes, haplotypes)
-	return haplotypes
+	haplotypes = haplotype_pairs(unknown_haplotypes, [possible_haplotypes(haplotype) for haplotype in unknown_haplotypes])
+	return haplotypes'''
 
 '''
 possible_haplotypes
 	takes in a haplotype of some individual genotype where 'heterozygous' is a heterozygous allele
 	returns a complete list of possible haplotypes for one individual
 '''
-  
-def possible_haplotypes(haplotype):
+def possible_haplotypes(genotype):
+	final_haplotype = [[]]
+	for snp in genotype:
+		if snp == 0 or snp == 2:
+			for pos in final_haplotype:
+				if snp == 0:
+					pos.append('0')
+				else:
+					pos.append('1')
+		elif snp == 1:
+			final_haplotype2 = [[] for each in range(len(final_haplotype))]
+			for i in range(len(final_haplotype)):
+				for j in range(len(final_haplotype[i])):
+					final_haplotype2[i].append(final_haplotype[i][j])
+			for k in range(len(final_haplotype)):
+				final_haplotype[k].append('0')
+				final_haplotype2[k].append('1')
+			final_haplotype = list(final_haplotype + final_haplotype2)
+	return final_haplotype
+
+def haplotype_pairs(genotypes, lst_haplotypes):
+	haplotypepairs = []
+	for i, indiv in enumerate(lst_haplotypes):
+		indiv_hap_pairs = []
+		for hap in indiv:
+			haplotype = []
+			for s, snp in enumerate(hap):
+				if genotypes[i][s] == 0 and snp == '0':
+					haplotype.append('0')
+				elif genotypes[i][s] == 2 and snp == '1':
+					haplotype.append('1')
+				else:
+					if snp == '1':
+						haplotype.append('0')
+					else:
+						haplotype.append('1')
+			hap = ''.join(hap)
+			haplotype = ''.join(haplotype)
+			pair = [hap, haplotype]
+			rev_pair = [haplotype, hap]
+			if pair not in indiv_hap_pairs and rev_pair not in indiv_hap_pairs:
+				indiv_hap_pairs.append(pair)
+		haplotypepairs.append(indiv_hap_pairs)
+	return haplotypepairs
+
+def lst_haplotypes(data):
+	genotypes = convert_to_genotypes(data)
+	return haplotype_pairs(genotypes, [possible_haplotypes(genotype) for genotype in genotypes])
+	
+'''def possible_haplotypes(haplotype):
 	final_haplotype = [[]]
 	for snp in haplotype:
 		if snp == '0' or snp == '1':
@@ -74,9 +121,9 @@ def possible_haplotypes(haplotype):
 				final_haplotype[k].append('0')
 				final_haplotype2[k].append('1')
 			final_haplotype = list(final_haplotype + final_haplotype2)
-	return final_haplotype
+	return final_haplotype'''
 
-def haplotype_pairs(unknown_haplotypes, lst_haplotypes):
+'''def haplotype_pairs(unknown_haplotypes, lst_haplotypes):
 	haplotype_pairs = []
 	for i in range(len(lst_haplotypes)):
 		indiv_hap_pairs = []
@@ -98,14 +145,14 @@ def haplotype_pairs(unknown_haplotypes, lst_haplotypes):
 			if pair not in indiv_hap_pairs and rev_pair not in indiv_hap_pairs:
 				indiv_hap_pairs.append(pair)
 		haplotype_pairs.append(indiv_hap_pairs)
-	return haplotype_pairs
+	return haplotype_pairs'''
 '''
 remove duplicates
 	flattens the list of haplotypes and removes all duplicates
 	returns a list of all possible haplotypes
 '''
 def remove_duplicates(possibleHaplotypes):
-	possibleHaplotypes = list(chain.from_iterable(possibleHaplotypes))
+	possibleHaplotypes = list(chain.from_iterable(list(possibleHaplotypes)))
 	possibleHaplotypes.sort()
 	result = list(possibleHaplotypes for possibleHaplotypes,_ in groupby(possibleHaplotypes))
 	return list(chain.from_iterable(result))
@@ -114,6 +161,11 @@ def remove_duplicates(possibleHaplotypes):
 # example_haplotypes1 = lst_haplotypes(loadfile("data/example_data_1.txt"))
 # print(np.shape(example_haplotypes1))
 #haps = lst_haplotypes((loadfile("data/test.txt")))
-#print(haps)
+#print(haps, '\n')
 #print(remove_duplicates(haps), '\n')
 #print(haps)
+#genotypes = convert_to_genotypes(loadfile("data/test.txt"))
+#haps = [possible_haplotypes(genotype) for genotype in genotypes]
+#print(haps, '\n')
+
+#print(genotypes)
