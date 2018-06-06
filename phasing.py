@@ -16,10 +16,7 @@ loadfile
 '''
 def loadfile(file_name):
 	data = np.loadtxt(file_name, delimiter = ' ')
-	snps = []
-	for line in data:
-		snps.append(list(line))
-	snps = np.array(snps)
+	snps = [list(line) for line in data]
 	return snps
 
 '''
@@ -120,4 +117,3 @@ def remove_duplicates(possibleHaplotypes):
 #print(haps)
 #print(remove_duplicates(haps), '\n')
 #print(haps)
-#print(np.shape(loadfile("data/example_data_1.txt")[0]))#

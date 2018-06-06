@@ -10,29 +10,13 @@ import numpy as np
 from itertools import chain
 
 def expectation_step(haplotypes, hap_pairs, freq_lst):
-	probabilities = []
 	numGenotypes = len(hap_pairs)
 	numHaplotypes = numGenotypes*2
-	totalFrequencyValue = []
-	for indiv in hap_pairs:
-		frequency = 0
-		for pair in indiv:
-			frequency += (freq_lst[''.join(pair[0])])*(freq_lst[''.join(pair[1])])
-		totalFrequencyValue.append(frequency)
-	for i in range(len(hap_pairs)):
-		probability = []
-		for p in range(len(hap_pairs[i])):
-			f1 = freq_lst[''.join(hap_pairs[i][p][0])]
-			f2 = freq_lst[''.join(hap_pairs[i][p][1])]
-			probability.append(find_probability(f1, f2, totalFrequencyValue[i]))
-		probabilities.append(probability)
+	totalFrequencyValue = [sum([(freq_lst[''.join(pair[0])])*(freq_lst[''.join(pair[1])]) for pair in indiv]) for indiv in hap_pairs]		
+	probabilities = [[find_probability(freq_lst[''.join(pair[0])], freq_lst[''.join(pair[1])], totalFrequencyValue[i]) for pair in indiv] for i, indiv in enumerate(hap_pairs)]
 	frequencies = {}
 	for haplotype in haplotypes:
-		probs = []
-		for j in range(len(hap_pairs)):
-			for q in range(len(hap_pairs[j])):
-				if hap_pairs[j][q][0] == haplotype or hap_pairs[j][q][1] == haplotype:
-					probs.append(probabilities[j][q])
+		probs = [probabilities[i][p] for i in range(numGenotypes) for p in range(len(hap_pairs[i])) if hap_pairs[i][p][0] == haplotype or hap_pairs[i][p][1] == haplotype]
 		frequencies[''.join(haplotype)] = find_frequency(probs, numHaplotypes)
 	return frequencies, probabilities			
 
@@ -93,7 +77,16 @@ graded_file2 = 'data/test_data_2.txt'
 
 short_file = 'data/test.txt'
 
-output_file_name = 'example1_sol_10-8.txt'
+output_file_name = 'test2_5-8.txt'
 
-final_haplotypes = em(file1, runs = 8, piecesize = 11)
-output(final_haplotypes, output_file_name)
+#final_haplotypes = em(file1, runs = 2, piecesize = 3)
+#output(final_haplotypes, output_file_name)
+
+from pycallgraph import PyCallGraph
+from pycallgraph.output import GraphvizOutput
+
+graphviz = GraphvizOutput()
+graphviz.output_file = 'check.png'
+
+with PyCallGraph(output=graphviz):
+	final_haplotypes = em(file1, runs = 2, piecesize = 3)
