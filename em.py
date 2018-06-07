@@ -37,7 +37,7 @@ def em(filename, runs, piecesize):
 		haplotypes = phasing.remove_duplicates(hap_pairs)
 		frequencies = {}
 		for haplotype in haplotypes:
-			frequencies[haplotype] = 1/(len(haplotypes))
+			frequencies[haplotype] = 1/(float(len(haplotypes)))
 		for run in range(runs):
 			frequencies, probabilities = expectation_step(haplotypes, hap_pairs, frequencies)
 			best_haps = maximization_step(probabilities, hap_pairs)
@@ -74,14 +74,16 @@ short_file = 'data/test.txt'
 
 output_file_name = 'test2_5-8.txt'
 
-#final_haplotypes = em(file1, runs = 2, piecesize = 3)
+final_haplotypes = em(file1, runs = 5, piecesize = 2)
+output(final_haplotypes, output_file_name)
 
-from pycallgraph import PyCallGraph
+'''from pycallgraph import PyCallGraph
 from pycallgraph.output import GraphvizOutput
 
 graphviz = GraphvizOutput()
-graphviz.output_file = 'timecheck.png'
+graphviz.output_file = 'check.png'
 
 with PyCallGraph(output=graphviz):
-	final_haplotypes = em(file1, runs = 2, piecesize = 3) # takes 10min to run on my laptop
+	final_haplotypes = em(file1, runs = 4, piecesize = 8) 
 	output(final_haplotypes, output_file_name)
+'''
