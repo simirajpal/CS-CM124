@@ -30,14 +30,16 @@ def maximization_step(probabilities, hap_pairs):
 
 def em(filename, runs, piecesize):
 	all_snps = phasing.loadfile(filename)
+	n = len(all_snps)
 	answer = []
 	i = 0
-	while i < len(all_snps):
+	while i < n:
 		hap_pairs = phasing.lst_haplotypes(all_snps[i:i+piecesize])
 		haplotypes = phasing.remove_duplicates(hap_pairs)
 		frequencies = {}
+		length = float(len(haplotypes))
 		for haplotype in haplotypes:
-			frequencies[haplotype] = 1/(float(len(haplotypes)))
+			frequencies[haplotype] = 1/length
 		for run in range(runs):
 			frequencies, probabilities = expectation_step(haplotypes, hap_pairs, frequencies)
 			best_haps = maximization_step(probabilities, hap_pairs)
@@ -74,7 +76,7 @@ short_file = 'data/test.txt'
 
 output_file_name = 'test2_5-8.txt'
 
-final_haplotypes = em(file1, runs = 5, piecesize = 2)
+final_haplotypes = em(file1, runs = 3, piecesize = 12)
 output(final_haplotypes, output_file_name)
 
 '''from pycallgraph import PyCallGraph
