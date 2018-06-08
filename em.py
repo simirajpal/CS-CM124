@@ -12,7 +12,7 @@ import sys
 from itertools import chain
 from collections import Counter,defaultdict
 
-def expectation_step(haplotypes, hap_pairs, numGenotypes, freq_lst):
+def em_step(haplotypes, hap_pairs, numGenotypes, freq_lst):
     #numGenotypes = len(hap_pairs)
     numHaplotypes = numGenotypes*2
     frequencies = [[(freq_lst[pair[0]])*(freq_lst[pair[1]]) for pair in indiv] for indiv in hap_pairs]
@@ -48,7 +48,7 @@ def find_probability(freq1, freq2, totalFrequencyValue):
 def find_frequency(probs, numOfHaps):
     return sum(probs)/numOfHaps
     
-def maximization_step(probabilities, hap_pairs):
+def best(probabilities, hap_pairs):
     return [hap_pairs[i][np.argmax(probabilities[i])] for i in range(len(probabilities))]
 
 def em(filename, runs, piecesize, remain):
@@ -68,9 +68,9 @@ def em(filename, runs, piecesize, remain):
         for haplotype in haplotypes:
             frequencies[haplotype] = const
         for run in range(runs):
-            frequencies, probabilities = expectation_step(haplotypes, hap_pairs, numGenotypes, frequencies)
+            frequencies, probabilities = em_step(haplotypes, hap_pairs, numGenotypes, frequencies)
         
-        best_haps = maximization_step(probabilities, hap_pairs)
+        best_haps = best(probabilities, hap_pairs)
         inprogress.append(best_haps)
         #if i == 0:
         #    answer = best_haps
