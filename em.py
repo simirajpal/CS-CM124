@@ -2,22 +2,42 @@
 @author: Simi Rajpal
 
 Haplotype Phasing for Recently Admixed Populations
-
 """
 
 import phasing
 import numpy as np
+import sys
 from itertools import chain
-from collections import Counter
+from collections import Counter,defaultdict
 
-def expectation_step(haplotypes, hap_pairs, freq_lst):
-    numGenotypes = len(hap_pairs)
+def expectation_step(haplotypes, hap_pairs, numGenotypes, freq_lst):
+    #numGenotypes = len(hap_pairs)
     numHaplotypes = numGenotypes*2
-    totalFrequencyValue = [sum([(freq_lst[pair[0]])*(freq_lst[pair[1]]) for pair in indiv]) for indiv in hap_pairs]        
-    probabilities = [[find_probability(freq_lst[pair[0]], freq_lst[pair[1]], totalFrequencyValue[i]) for pair in indiv] for i, indiv in enumerate(hap_pairs)]
-    frequencies = {}
+    frequencies = [[(freq_lst[pair[0]])*(freq_lst[pair[1]]) for pair in indiv] for indiv in hap_pairs]
+    #totalFrequencyValue = [sum(f) for f in frequencies]        
+    #probabilities = [[find_probability(freq_lst[pair[0]], freq_lst[pair[1]], totalFrequencyValue[i]) for pair in indiv] for i, indiv in enumerate(hap_pairs)]
+    probabilities = []
+    
+    for f in frequencies:
+        totalFrequency = sum(f)
+        temp = [freq/totalFrequency for freq in f]
+        probabilities.append(temp)
+    
+    frequencies = defaultdict(lambda: 0)
+    #for haplotype in haplotypes:
+    for i in range(numGenotypes):
+        for p in range(len(hap_pairs[i])):
+            haplotype1 = hap_pairs[i][p][0]
+            haplotype2 = hap_pairs[i][p][1]
+            prob = probabilities[i][p]
+            frequencies[haplotype1] = frequencies[haplotype1] + prob
+            frequencies[haplotype2] = frequencies[haplotype2] + prob
+        #oh = [probabilities[i][p] for i in range(numGenotypes) for p in range(len(hap_pairs[i])) if hap_pairs[i][p][0] == haplotype or hap_pairs[i][p][1] == haplotype]
+        #frequencies[haplotype] = find_frequency(oh, numHaplotypes)
+    
     for haplotype in haplotypes:
-        frequencies[haplotype] = find_frequency([probabilities[i][p] for i in range(numGenotypes) for p in range(len(hap_pairs[i])) if hap_pairs[i][p][0] == haplotype or hap_pairs[i][p][1] == haplotype], numHaplotypes)
+        frequencies[haplotype] /= numHaplotypes 
+    
     return frequencies, probabilities            
 
 def find_probability(freq1, freq2, totalFrequencyValue):
@@ -35,15 +55,18 @@ def em(filename, runs, piecesize, remain):
     answer = []
     mult = piecesize // remain
     lensnp = len(all_snps)
+    numGenotypes = len(all_snps[0])
     i = 0
     while i < lensnp:
         hap_pairs = phasing.lst_haplotypes(all_snps[i:i+piecesize])
         haplotypes = phasing.remove_duplicates(hap_pairs)
+        haplotypes = [''.join(h) for h in haplotypes]
         frequencies = {}
+        const = 1/(float(len(haplotypes)))
         for haplotype in haplotypes:
-            frequencies[haplotype] = 1/(float(len(haplotypes)))
+            frequencies[haplotype] = const
         for run in range(runs):
-            frequencies, probabilities = expectation_step(haplotypes, hap_pairs, frequencies)
+            frequencies, probabilities = expectation_step(haplotypes, hap_pairs, numGenotypes, frequencies)
         
         best_haps = maximization_step(probabilities, hap_pairs)
         inprogress.append(best_haps)
@@ -59,14 +82,13 @@ def em(filename, runs, piecesize, remain):
 
     #start off answer
     for b in inprogress[0]:
-        answer.append([bb[:remain] for bb in b])
+        answer.append([b[0][:remain], b[1][:remain]])
     for i in range(len(answer)):
         for j in range(2):
             for r in range(1, mult-1):
                 answer[i][j] += inprogress[r][i][j][:remain]
     
     #add consensus into the answer
-    compare = []
     edge = remain * (mult - 1)
     for index in range(edge, lensnp - edge, remain):
         seg = index // remain
@@ -76,8 +98,7 @@ def em(filename, runs, piecesize, remain):
             #for m in range(mult):
                 #wow.append(inprogress[seg - m][j][remain*m:remain*(m+1)])
                 wow = [inprogress[seg - m][i][j][remain*m:remain*(m+1)] for m in range(mult)]
-                compare = np.array(wow)
-                compare = np.transpose(compare)
+                compare = [[wow[j][i] for j in range(mult)] for i in range(remain)]
                 e = [Counter(c).most_common(1)[0][0] for c in compare]
                 answer[i][j] += ''.join(e)
     
@@ -111,16 +132,5 @@ short_file = 'data/test.txt'
 
 output_file_name = 'finally.txt'
 
-final_haplotypes = em(file1, runs = int(2), piecesize = int(4), remain = int(2))
+final_haplotypes = em(sys.argv[1], runs = int(sys.argv[2]), piecesize = int(sys.argv[3]), remain = int(sys.argv[4]))
 output(final_haplotypes, output_file_name)
-
-'''from pycallgraph import PyCallGraph
-from pycallgraph.output import GraphvizOutput
-
-graphviz = GraphvizOutput()
-graphviz.output_file = 'check.png'
-
-with PyCallGraph(output=graphviz):
-    final_haplotypes = em(file1, runs = 4, piecesize = 8) 
-    output(final_haplotypes, output_file_name)
-'''

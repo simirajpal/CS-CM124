@@ -152,10 +152,10 @@ remove duplicates
 	returns a list of all possible haplotypes
 '''
 def remove_duplicates(possibleHaplotypes):
-	possibleHaplotypes = list(chain.from_iterable(list(possibleHaplotypes)))
+	possibleHaplotypes = list(chain.from_iterable(chain.from_iterable(possibleHaplotypes)))
 	possibleHaplotypes.sort()
-	result = list(possibleHaplotypes for possibleHaplotypes,_ in groupby(possibleHaplotypes))
-	return list(chain.from_iterable(result))
+	result = [possibleHaplotype for possibleHaplotype,_ in groupby(possibleHaplotypes)]
+	return result
   
 
 # example_haplotypes1 = lst_haplotypes(loadfile("data/example_data_1.txt"))
