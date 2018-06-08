@@ -1,7 +1,9 @@
 """
-@author: Simi Rajpal
+@author: Simi Rajpal, Linus Chen
 
 Haplotype Phasing for Recently Admixed Populations
+
+arguments: input file, iteration count, piece size, increment, output file
 """
 
 import phasing
@@ -130,7 +132,7 @@ graded_file2 = 'data/test_data_2.txt'
 
 short_file = 'data/test.txt'
 
-output_file_name = 'finally.txt'
+output_file_name = 'output_example_data_1.txt'
 
 final_haplotypes = em(sys.argv[1], runs = int(sys.argv[2]), piecesize = int(sys.argv[3]), remain = int(sys.argv[4]))
-output(final_haplotypes, output_file_name)
+output(final_haplotypes, sys.argv[5])
