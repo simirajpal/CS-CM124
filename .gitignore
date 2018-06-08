@@ -1,3 +1,6 @@
 
 *.txt
 hubris.zip
+clarks.py
+calculate_switch_accuracy.R
+__pycache__/phasing.cpython-36.pyc
