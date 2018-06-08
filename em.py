@@ -27,6 +27,7 @@ def find_frequency(probs, numOfHaps):
     return sum(probs)/numOfHaps
     
 def maximization_step(probabilities, hap_pairs):
+<<<<<<< HEAD
     return [hap_pairs[i][np.argmax(probabilities[i])] for i in range(len(probabilities))]
 
 def em(filename, runs, piecesize, remain):
@@ -88,6 +89,33 @@ def em(filename, runs, piecesize, remain):
 
     return answer
     
+	return [hap_pairs[i][np.argmax(probabilities[i])] for i in range(len(probabilities))]
+
+def em(filename, runs, piecesize):
+	all_snps = phasing.loadfile(filename)
+	n = len(all_snps)
+	answer = []
+	i = 0
+	while i < n:
+		hap_pairs = phasing.lst_haplotypes(all_snps[i:i+piecesize])
+		haplotypes = phasing.remove_duplicates(hap_pairs)
+		frequencies = {}
+		length = float(len(haplotypes))
+		for haplotype in haplotypes:
+			frequencies[haplotype] = 1/length
+		for run in range(runs):
+			frequencies, probabilities = expectation_step(haplotypes, hap_pairs, frequencies)
+			best_haps = maximization_step(probabilities, hap_pairs)
+		if i == 0:
+			answer = best_haps
+		else:
+			for j in range(len(answer)):
+				for k in range(len(answer[j])):
+					answer[j][k] += best_haps[j][k]
+					#answer[j][k] = list(chain.from_iterable(answer[j][k]))
+		print("completed piece # ",i)
+		i+= piecesize
+	return answer
 def output(final_haplotypes, output_file):
     haplotypes_flattened = list(chain.from_iterable(final_haplotypes))
     #haplotypes_flattened = final_haplotypes
@@ -111,7 +139,10 @@ short_file = 'data/test.txt'
 
 output_file_name = 'finally.txt'
 
+<<<<<<< HEAD
 final_haplotypes = em(file1, runs = int(2), piecesize = int(4), remain = int(2))
+=======
+final_haplotypes = em(file1, runs = 3, piecesize = 12)
 output(final_haplotypes, output_file_name)
 
 '''from pycallgraph import PyCallGraph
